@@ -79,6 +79,11 @@ const BookingPanel = props => {
   const { formattedPrice, priceTitle } = priceData(price, intl);
   const isBook = !!parse(location.search).book;
 
+  const cleaningFee =
+    listing.attributes.publicData && listing.attributes.publicData.cleaningFee
+      ? listing.attributes.publicData.cleaningFee
+      : null;
+
   const subTitleText = !!subTitle
     ? subTitle
     : showClosedListingHelpText
@@ -134,6 +139,7 @@ const BookingPanel = props => {
             lineItems={lineItems}
             fetchLineItemsInProgress={fetchLineItemsInProgress}
             fetchLineItemsError={fetchLineItemsError}
+            cleaningFee={cleaningFee}
           />
         ) : null}
       </ModalInMobile>

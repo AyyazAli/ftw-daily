@@ -9,7 +9,7 @@ import {
   txIsCanceled,
   txIsDeclined,
   txIsEnquired,
-  txIsRequested,
+  // txIsRequested,
   txHasBeenDelivered,
   txIsPaymentExpired,
   txIsPaymentPending,
@@ -64,28 +64,28 @@ export const txState = (intl, tx, type) => {
         id: 'InboxPage.stateEnquiry',
       }),
     };
-  } else if (txIsRequested(tx)) {
-    const requested = isOrder
-      ? {
-          nameClassName: css.nameNotEmphasized,
-          bookingClassName: css.bookingNoActionNeeded,
-          lastTransitionedAtClassName: css.lastTransitionedAtEmphasized,
-          stateClassName: css.stateActionNeeded,
-          state: intl.formatMessage({
-            id: 'InboxPage.stateRequested',
-          }),
-        }
-      : {
-          nameClassName: css.nameEmphasized,
-          bookingClassName: css.bookingActionNeeded,
-          lastTransitionedAtClassName: css.lastTransitionedAtEmphasized,
-          stateClassName: css.stateActionNeeded,
-          state: intl.formatMessage({
-            id: 'InboxPage.statePending',
-          }),
-        };
+    // } else if (txIsRequested(tx)) {
+    //   const requested = isOrder
+    //     ? {
+    //         nameClassName: css.nameNotEmphasized,
+    //         bookingClassName: css.bookingNoActionNeeded,
+    //         lastTransitionedAtClassName: css.lastTransitionedAtEmphasized,
+    //         stateClassName: css.stateActionNeeded,
+    //         state: intl.formatMessage({
+    //           id: 'InboxPage.stateRequested',
+    //         }),
+    //       }
+    //     : {
+    //         nameClassName: css.nameEmphasized,
+    //         bookingClassName: css.bookingActionNeeded,
+    //         lastTransitionedAtClassName: css.lastTransitionedAtEmphasized,
+    //         stateClassName: css.stateActionNeeded,
+    //         state: intl.formatMessage({
+    //           id: 'InboxPage.statePending',
+    //         }),
+    //       };
 
-    return requested;
+    //   return requested;
   } else if (txIsPaymentPending(tx)) {
     return {
       nameClassName: isOrder ? css.nameNotEmphasized : css.nameEmphasized,

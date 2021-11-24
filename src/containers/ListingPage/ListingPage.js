@@ -41,7 +41,12 @@ import {
 } from '../../components';
 import { TopbarContainer, NotFoundPage } from '../../containers';
 
-import { sendEnquiry, fetchTransactionLineItems, setInitialValues } from './ListingPage.duck';
+import {
+  sendEnquiry,
+  fetchTransactionLineItems,
+  setInitialValues,
+  fetchCurrentUserWishlist,
+} from './ListingPage.duck';
 import SectionImages from './SectionImages';
 import SectionAvatar from './SectionAvatar';
 import SectionHeading from './SectionHeading';
@@ -51,6 +56,7 @@ import SectionReviews from './SectionReviews';
 import SectionHostMaybe from './SectionHostMaybe';
 import SectionRulesMaybe from './SectionRulesMaybe';
 import SectionMapMaybe from './SectionMapMaybe';
+import SectionViewMaybe from './SectionViewMaybe';
 import css from './ListingPage.module.css';
 
 const MIN_LENGTH_FOR_LONG_WORDS_IN_TITLE = 16;
@@ -196,6 +202,7 @@ export class ListingPageComponent extends Component {
       lineItems,
       fetchLineItemsInProgress,
       fetchLineItemsError,
+      history,
     } = this.props;
 
     const listingId = new UUID(rawParams.id);
@@ -376,8 +383,11 @@ export class ListingPageComponent extends Component {
       </NamedLink>
     );
 
-    const amenityOptions = findOptionsForSelectFilter('amenities', filterConfig);
     const categoryOptions = findOptionsForSelectFilter('category', filterConfig);
+
+    const viewOptions = findOptionsForSelectFilter('view', filterConfig);
+    const amenityOptions = findOptionsForSelectFilter('amenities', filterConfig);
+
     const category =
       publicData && publicData.category ? (
         <span>
@@ -433,6 +443,9 @@ export class ListingPageComponent extends Component {
                     hostLink={hostLink}
                     showContactUser={showContactUser}
                     onContactUser={this.onContactUser}
+                    listingId={listingId}
+                    currentUser={currentUser}
+                    history={history}
                   />
                   <SectionDescriptionMaybe description={description} />
                   <SectionFeaturesMaybe options={amenityOptions} publicData={publicData} />
@@ -456,6 +469,7 @@ export class ListingPageComponent extends Component {
                     currentUser={currentUser}
                     onManageDisableScrolling={onManageDisableScrolling}
                   />
+                  <SectionViewMaybe options={viewOptions} publicData={publicData} />
                 </div>
                 <BookingPanel
                   className={css.bookingPanel}
@@ -558,6 +572,7 @@ const mapStateToProps = state => {
     fetchLineItemsInProgress,
     fetchLineItemsError,
     enquiryModalOpenForListingId,
+    wishlistArray,
   } = state.ListingPage;
   const { currentUser } = state.user;
 
@@ -590,6 +605,7 @@ const mapStateToProps = state => {
     fetchLineItemsError,
     sendEnquiryInProgress,
     sendEnquiryError,
+    wishlistArray,
   };
 };
 
@@ -602,6 +618,7 @@ const mapDispatchToProps = dispatch => ({
     dispatch(fetchTransactionLineItems(bookingData, listingId, isOwnListing)),
   onSendEnquiry: (listingId, message) => dispatch(sendEnquiry(listingId, message)),
   onInitializeCardPaymentData: () => dispatch(initializeCardPaymentData()),
+  fetchCurrentUserWishlist: params => dispatch(fetchCurrentUserWishlist(params)),
 });
 
 // Note: it is important that the withRouter HOC is **outside** the

@@ -200,10 +200,17 @@ export const signup = params => (dispatch, getState, sdk) => {
   }
   dispatch(signupRequest());
   const { email, password, firstName, lastName, ...rest } = params;
-
+  const wishlist = rest.wishlist || [];
   const createUserParams = isEmpty(rest)
     ? { email, password, firstName, lastName }
-    : { email, password, firstName, lastName, protectedData: { ...rest } };
+    : {
+        email,
+        password,
+        firstName,
+        lastName,
+        protectedData: { ...rest },
+        privateData: { wishlist },
+      };
 
   // We must login the user if signup succeeds since the API doesn't
   // do that automatically.

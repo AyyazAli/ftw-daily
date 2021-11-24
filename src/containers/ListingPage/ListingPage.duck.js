@@ -39,6 +39,19 @@ export const SEND_ENQUIRY_REQUEST = 'app/ListingPage/SEND_ENQUIRY_REQUEST';
 export const SEND_ENQUIRY_SUCCESS = 'app/ListingPage/SEND_ENQUIRY_SUCCESS';
 export const SEND_ENQUIRY_ERROR = 'app/ListingPage/SEND_ENQUIRY_ERROR';
 
+export const FETCH_CURRENT_USER_WISHLIST_REQUEST =
+  'app/ListingPage/FETCH_CURRENT_USER_WISHLIST_REQUEST';
+export const FETCH_CURRENT_USER_WISHLIST_SUCCESS =
+  'app/ListingPage/FETCH_CURRENT_USER_WISHLIST_SUCCESS';
+export const FETCH_CURRENT_USER_WISHLIST_ERROR =
+  'app/ListingPage/FETCH_CURRENT_USER_WISHLIST_ERROR';
+
+export const ADD_WISHLIST_TO_WISHLIST_ARRAY = 'app/user/ADD_WISHLIST_TO_WISHLIST_ARRAY';
+
+export const ADD_TO_WISHLIST_REQUEST = 'app/user/ADD_TO_WISHLIST_REQUEST';
+export const ADD_TO_WISHLIST_SUCCESS = 'app/user/ADD_TO_WISHLIST_SUCCESS';
+export const ADD_TO_WISHLIST_ERROR = 'app/user/ADD_TO_WISHLIST_ERROR';
+
 // ================ Reducer ================ //
 
 const initialState = {
@@ -54,6 +67,11 @@ const initialState = {
   sendEnquiryInProgress: false,
   sendEnquiryError: null,
   enquiryModalOpenForListingId: null,
+  currentUserHasWishlist: null,
+  currentUserHasWishlistError: null,
+  currentUserWishlist: null,
+  currentUserWishlistError: null,
+  wishlistArray: [],
 };
 
 const listingPageReducer = (state = initialState, action = {}) => {
@@ -94,6 +112,25 @@ const listingPageReducer = (state = initialState, action = {}) => {
       return { ...state, sendEnquiryInProgress: false };
     case SEND_ENQUIRY_ERROR:
       return { ...state, sendEnquiryInProgress: false, sendEnquiryError: payload };
+
+    case FETCH_CURRENT_USER_WISHLIST_REQUEST:
+      return { ...state, currentUserHasWishlistError: null };
+    case FETCH_CURRENT_USER_WISHLIST_SUCCESS:
+      return { ...state, wishlistArray: payload };
+    case FETCH_CURRENT_USER_WISHLIST_ERROR:
+      console.error(payload); // eslint-disable-line
+      return { ...state, currentUserHasWishlistError: payload };
+
+    case ADD_WISHLIST_TO_WISHLIST_ARRAY:
+      return { ...state, wishlistArray: [payload] };
+
+    case ADD_TO_WISHLIST_REQUEST:
+      return { ...state, currentUserWishlistError: null };
+    case ADD_TO_WISHLIST_SUCCESS:
+      return { ...state, currentUserWishlist: payload.listings };
+    case ADD_TO_WISHLIST_ERROR:
+      console.error(payload); // eslint-disable-line
+      return { ...state, currentUserWishlistError: payload };
 
     default:
       return state;
@@ -153,6 +190,41 @@ export const fetchLineItemsError = error => ({
 export const sendEnquiryRequest = () => ({ type: SEND_ENQUIRY_REQUEST });
 export const sendEnquirySuccess = () => ({ type: SEND_ENQUIRY_SUCCESS });
 export const sendEnquiryError = e => ({ type: SEND_ENQUIRY_ERROR, error: true, payload: e });
+
+const fetchCurrentUserWishlistRequest = () => ({
+  type: FETCH_CURRENT_USER_WISHLIST_REQUEST,
+});
+
+export const fetchCurrentUserWishlistSuccess = wishlist => ({
+  type: FETCH_CURRENT_USER_WISHLIST_SUCCESS,
+  payload: wishlist,
+});
+
+const fetchCurrentUserWishlistError = e => ({
+  type: FETCH_CURRENT_USER_WISHLIST_ERROR,
+  error: true,
+  payload: e,
+});
+
+const addWishlistToWishlistArray = wishlist => ({
+  type: ADD_WISHLIST_TO_WISHLIST_ARRAY,
+  payload: wishlist,
+});
+
+const addCurrentUserWishlistRequest = () => ({
+  type: ADD_TO_WISHLIST_REQUEST,
+});
+
+export const addCurrentUserWishlistSuccess = hasWishlist => ({
+  type: ADD_TO_WISHLIST_SUCCESS,
+  payload: { hasWishlist },
+});
+
+const addCurrentUserWishlistError = e => ({
+  type: ADD_TO_WISHLIST_ERROR,
+  error: true,
+  payload: e,
+});
 
 // ================ Thunks ================ //
 
@@ -329,4 +401,41 @@ export const loadData = (params, search) => dispatch => {
   } else {
     return Promise.all([dispatch(showListing(listingId)), dispatch(fetchReviews(listingId))]);
   }
+};
+
+export const fetchCurrentUserWishlist = params => (dispatch, getState, sdk) => {
+  return sdk.currentUser
+    .show()
+    .then(response => {
+      const wishlist = response.data.data.attributes.profile.privateData.wishlist;
+      dispatch(fetchCurrentUserWishlistSuccess(wishlist));
+    })
+    .catch(e => dispatch(fetchCurrentUserWishlistError(storableError(e))));
+};
+
+export const addWishlistToArray = params => (dispatch, getState, sdk) => {
+  const { listing } = params;
+
+  console.log('Passing wishlist to be added to array...: ', listing);
+  return dispatch(addWishlistToWishlistArray(listing));
+};
+
+export const addCurrentUserWishlist = params => (dispatch, getState, sdk) => {
+  const { listing, privateData, wishlists } = params;
+  dispatch(addWishlistToArray(params));
+
+  console.log('Before pushing', wishlists);
+  wishlists.push(listing);
+
+  if (wishlists[0] == undefined) {
+    wishlists.shift();
+    console.log('After pushing and removing undefined', wishlists);
+  }
+
+  return sdk.currentUser
+    .updateProfile({ privateData: { wishlist: wishlists } })
+    .then(response => {
+      console.log(response);
+    })
+    .catch(e => dispatch(fetchCurrentUserWishlistError(storableError(e))));
 };

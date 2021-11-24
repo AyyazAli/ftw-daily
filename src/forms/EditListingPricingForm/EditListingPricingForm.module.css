@@ -19,6 +19,11 @@
 .priceInput {
   flex-shrink: 0;
   width: 100%;
+  padding-left: 10px;
+}
+
+.cleaningFeeInput {
+  padding-left: 10px;
 }
 
 .submitButton {

@@ -10,7 +10,7 @@ import {
   txIsEnquired,
   txIsPaymentExpired,
   txIsPaymentPending,
-  txIsRequested,
+  // txIsRequested,
   txHasBeenDelivered,
 } from '../../util/transaction';
 import { LINE_ITEM_NIGHT, LINE_ITEM_DAY, propTypes } from '../../util/types';
@@ -236,12 +236,12 @@ export class TransactionPanelComponent extends Component {
           headingState: HEADING_PAYMENT_EXPIRED,
           showDetailCardHeadings: isCustomer,
         };
-      } else if (txIsRequested(tx)) {
-        return {
-          headingState: HEADING_REQUESTED,
-          showDetailCardHeadings: isCustomer,
-          showSaleButtons: isProvider && !isCustomerBanned,
-        };
+        // } else if (txIsRequested(tx)) {
+        //   return {
+        //     headingState: HEADING_REQUESTED,
+        //     showDetailCardHeadings: isCustomer,
+        //     showSaleButtons: isProvider && !isCustomerBanned,
+        //   };
       } else if (txIsAccepted(tx)) {
         return {
           headingState: HEADING_ACCEPTED,

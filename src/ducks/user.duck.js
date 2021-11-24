@@ -1,6 +1,6 @@
 import { denormalisedResponseEntities, ensureOwnListing } from '../util/data';
 import { storableError } from '../util/errors';
-import { transitionsToRequested } from '../util/transaction';
+// import { transitionsToRequested } from '../util/transaction';
 import { LISTING_STATE_DRAFT } from '../util/types';
 import * as log from '../util/log';
 import { authInfo } from './Auth.duck';
@@ -39,6 +39,17 @@ export const SEND_VERIFICATION_EMAIL_REQUEST = 'app/user/SEND_VERIFICATION_EMAIL
 export const SEND_VERIFICATION_EMAIL_SUCCESS = 'app/user/SEND_VERIFICATION_EMAIL_SUCCESS';
 export const SEND_VERIFICATION_EMAIL_ERROR = 'app/user/SEND_VERIFICATION_EMAIL_ERROR';
 
+// export const FETCH_CURRENT_USER_HAS_WISHLIST_REQUEST =
+//   'app/user/FETCH_CURRENT_USER_HAS_WISHLIST_REQUEST';
+// export const FETCH_CURRENT_USER_HAS_WISHLIST_SUCCESS =
+//   'app/user/FETCH_CURRENT_USER_HAS_WISHLIST_SUCCESS';
+// export const FETCH_CURRENT_USER_HAS_WISHLIST_ERROR =
+//   'app/user/FETCH_CURRENT_USER_HAS_WISHLIST_ERROR';
+
+// export const ADD_TO_WISHLIST_REQUEST = 'app/user/ADD_TO_WISHLIST_REQUEST';
+// export const ADD_TO_WISHLIST_SUCCESS = 'app/user/ADD_TO_WISHLIST_SUCCESS';
+// export const ADD_TO_WISHLIST_ERROR = 'app/user/ADD_TO_WISHLIST_ERROR';
+
 // ================ Reducer ================ //
 
 const mergeCurrentUser = (oldCurrentUser, newCurrentUser) => {
@@ -66,6 +77,8 @@ const initialState = {
   currentUserHasOrdersError: null,
   sendVerificationEmailInProgress: false,
   sendVerificationEmailError: null,
+  // currentUserHasWishlist: null,
+  // currentUserHasWishlistError: null,
 };
 
 export default function reducer(state = initialState, action = {}) {
@@ -132,6 +145,14 @@ export default function reducer(state = initialState, action = {}) {
         sendVerificationEmailInProgress: false,
         sendVerificationEmailError: payload,
       };
+
+    // case FETCH_CURRENT_USER_HAS_WISHLIST_REQUEST:
+    //   return { ...state, currentUserHasWishlistError: null };
+    // case FETCH_CURRENT_USER_HAS_WISHLIST_SUCCESS:
+    //   return { ...state, currentUserHasWishlist: payload.hasWishlist };
+    // case FETCH_CURRENT_USER_HAS_WISHLIST_ERROR:
+    //   console.error(payload); // eslint-disable-line
+    //   return { ...state, currentUserHasWishlistError: payload };
 
     default:
       return state;
@@ -216,6 +237,21 @@ const fetchCurrentUserHasOrdersError = e => ({
   payload: e,
 });
 
+// const fetchCurrentUserHasWishlistRequest = () => ({
+//   type: FETCH_CURRENT_USER_HAS_WISHLIST_REQUEST,
+// });
+
+// export const fetchCurrentUserHasWishlistSuccess = hasWishlist => ({
+//   type: FETCH_CURRENT_USER_HAS_WISHLIST_SUCCESS,
+//   payload: { hasWishlist },
+// });
+
+// const fetchCurrentUserHasWishlistError = e => ({
+//   type: FETCH_CURRENT_USER_HAS_WISHLIST_ERROR,
+//   error: true,
+//   payload: e,
+// });
+
 export const sendVerificationEmailRequest = () => ({
   type: SEND_VERIFICATION_EMAIL_REQUEST,
 });
@@ -284,6 +320,39 @@ export const fetchCurrentUserHasOrders = () => (dispatch, getState, sdk) => {
     .catch(e => dispatch(fetchCurrentUserHasOrdersError(storableError(e))));
 };
 
+// export const fetchCurrentUserHasWishlist = () => (dispatch, getState, sdk) => {
+//   dispatch(fetchCurrentUserHasWishlistRequest());
+
+//   if (!getState().user.currentUser) {
+//     dispatch(fetchCurrentUserHasWishlistSuccess(false));
+//     return Promise.resolve(null);
+//   }
+
+//   return sdk.currentUser
+//     .show()
+//     .then(response => {
+//       const hasWishlist =
+//         response.data.data.attributes.profile.privateData &&
+//         response.data.data.attributes.profile.privateData.length > 0;
+//       dispatch(fetchCurrentUserHasWishlistSuccess(!!hasWishlist));
+//     })
+//     .catch(e => dispatch(fetchCurrentUserHasWishlistError(storableError(e))));
+// };
+
+// export const addCurrentUserWishlist = params => (dispatch, getState, sdk) => {
+//   const { listings } = params;
+
+//   return sdk.currentUser
+//     .updateProfile()
+//     .then(response => {
+//       const hasWishlist =
+//         response.data.data.attributes.profile.privateData &&
+//         response.data.data.attributes.profile.privateData.length > 0;
+//       dispatch(fetchCurrentUserHasWishlistSuccess(!!hasWishlist));
+//     })
+//     .catch(e => dispatch(fetchCurrentUserHasWishlistError(storableError(e))));
+// };
+
 // Notificaiton page size is max (100 items on page)
 const NOTIFICATION_PAGE_SIZE = 100;
 
@@ -292,7 +361,7 @@ export const fetchCurrentUserNotifications = () => (dispatch, getState, sdk) => 
 
   const apiQueryParams = {
     only: 'sale',
-    last_transitions: transitionsToRequested,
+    // last_transitions: transitionsToRequested,
     page: 1,
     per_page: NOTIFICATION_PAGE_SIZE,
   };
@@ -358,6 +427,7 @@ export const fetchCurrentUser = (params = null) => (dispatch, getState, sdk) => 
     .then(currentUser => {
       dispatch(fetchCurrentUserHasListings());
       dispatch(fetchCurrentUserNotifications());
+      // dispatch(fetchCurrentUserHasWishlist());
       if (!currentUser.attributes.emailVerified) {
         dispatch(fetchCurrentUserHasOrders());
       }

@@ -7,8 +7,7 @@ import { FormattedMessage } from '../../util/reactIntl';
 import { findOptionsForSelectFilter } from '../../util/search';
 import { propTypes } from '../../util/types';
 import config from '../../config';
-import { Button, FieldCheckboxGroup, Form } from '../../components';
-
+import { Button, FieldCheckboxGroup, FieldSelect, Form } from '../../components';
 import css from './EditListingFeaturesForm.module.css';
 
 const EditListingFeaturesFormComponent = props => (
@@ -36,6 +35,10 @@ const EditListingFeaturesFormComponent = props => (
       const submitInProgress = updateInProgress;
       const submitDisabled = disabled || submitInProgress;
 
+      // Props for "view" select field
+      const viewKey = 'view';
+      const viewOptions = findOptionsForSelectFilter(viewKey, filterConfig);
+
       const { updateListingError, showListingsError } = fetchErrors || {};
       const errorMessage = updateListingError ? (
         <p className={css.error}>
@@ -55,7 +58,21 @@ const EditListingFeaturesFormComponent = props => (
           {errorMessage}
           {errorMessageShowListing}
 
-          <FieldCheckboxGroup className={css.features} id={name} name={name} options={options} />
+          <FieldCheckboxGroup
+            className={css.features}
+            id={name}
+            name={name}
+            options={options}
+            label="amenities"
+          />
+
+          <FieldSelect className={css.features} name={viewKey} id={viewKey} label={'Location type'}>
+            {viewOptions.map(o => (
+              <option key={o.key} value={o.key}>
+                {o.label}
+              </option>
+            ))}
+          </FieldSelect>
 
           <Button
             className={css.submitButton}
