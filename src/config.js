@@ -63,6 +63,8 @@ const dayCountAvailableForBooking = 90;
 const sdkClientId = process.env.REACT_APP_SHARETRIBE_SDK_CLIENT_ID;
 const sdkBaseUrl = process.env.REACT_APP_SHARETRIBE_SDK_BASE_URL;
 const sdkTransitVerbose = process.env.REACT_APP_SHARETRIBE_SDK_TRANSIT_VERBOSE === 'true';
+const sdkIntegrationClientId = process.env.REACT_APP_FLEX_INTEGRATION_CLIENT_ID;
+const sdkIntegrationClientSecret = process.env.REACT_APP_FLEX_INTEGRATION_CLIENT_SECRET;
 
 // Marketplace currency.
 // It should match one of the currencies listed in currency-config.js
@@ -204,6 +206,8 @@ const config = {
     clientId: sdkClientId,
     baseUrl: sdkBaseUrl,
     transitVerbose: sdkTransitVerbose,
+    integrationClientId: sdkIntegrationClientId,
+    integrationClientSecret: sdkIntegrationClientSecret,
   },
   sortSearchByDistance,
   currency,

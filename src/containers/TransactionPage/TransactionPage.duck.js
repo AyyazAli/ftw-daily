@@ -22,6 +22,18 @@ import {
 } from '../../util/data';
 import { addMarketplaceEntities } from '../../ducks/marketplaceData.duck';
 import { fetchCurrentUserNotifications } from '../../ducks/user.duck';
+const flexIntegrationSdk = require('sharetribe-flex-integration-sdk');
+
+const integrationSdk = flexIntegrationSdk.createInstance({
+  // These two env vars need to be set in the `.env` file.
+  clientId: config.sdk.integrationClientId,
+  clientSecret: config.sdk.integrationClientSecret,
+
+  //   // Normally you can just skip setting the base URL and just use the
+  //   // default that the `createInstance` uses. We explicitly set it here
+  //   // for local testing and development.
+  baseUrl: process.env.FLEX_INTEGRATION_BASE_URL || 'https://flex-integ-api.sharetribe.com',
+});
 
 const { UUID } = sdkTypes;
 
@@ -490,10 +502,36 @@ const IMAGE_VARIANTS = {
 
 // If other party has already sent a review, we need to make transition to
 // TRANSITION_REVIEW_2_BY_<CUSTOMER/PROVIDER>
-const sendReviewAsSecond = (id, params, role, dispatch, sdk) => {
+const sendReviewAsSecond = (tx, params, role, dispatch, sdk) => {
   const transition = getReview2Transition(role === CUSTOMER);
 
   const include = REVIEW_TX_INCLUDES;
+
+  const { id, listing, reviews } = tx;
+  const { reviewRating } = params;
+
+  const averageRating = listing.attributes.metadata.averageRating;
+  let updatedAverageRating = 0;
+  const numberOfReviews = reviews.length;
+
+  updatedAverageRating = (averageRating + reviewRating) / (numberOfReviews + 1);
+
+  if (role === CUSTOMER) {
+    console.log(
+      'average rating: ' + averageRating,
+      ' Number of reviews: ' + numberOfReviews,
+      ' updated average rating: ' + updatedAverageRating
+    );
+
+    integrationSdk.listings
+      .update({
+        id: listing.id.uuid,
+        metadata: { averageRating: updatedAverageRating },
+      })
+      .then(res => {
+        console.log(res.data.data);
+      });
+  }
 
   return sdk.transactions
     .transition({ id, transition, params }, { expand: true, include, ...IMAGE_VARIANTS })
@@ -516,9 +554,34 @@ const sendReviewAsSecond = (id, params, role, dispatch, sdk) => {
 // However, the other party might have made the review after previous data synch point.
 // So, error is likely to happen and then we must try another state transition
 // by calling sendReviewAsSecond().
-const sendReviewAsFirst = (id, params, role, dispatch, sdk) => {
+const sendReviewAsFirst = (tx, params, role, dispatch, sdk) => {
   const transition = getReview1Transition(role === CUSTOMER);
   const include = REVIEW_TX_INCLUDES;
+  const { id, listing, reviews } = tx;
+  const { reviewRating } = params;
+
+  const averageRating = listing.attributes.metadata.averageRating || 0;
+  let updatedAverageRating = 0;
+  const numberOfReviews = reviews.length;
+
+  updatedAverageRating = (averageRating + reviewRating) / (numberOfReviews + 1);
+
+  if (role === CUSTOMER) {
+    console.log(
+      'average rating: ' + averageRating,
+      ' Number of reviews: ' + numberOfReviews,
+      ' updated average rating: ' + updatedAverageRating
+    );
+
+    integrationSdk.listings
+      .update({
+        id: listing.id.uuid,
+        metadata: { averageRating: updatedAverageRating },
+      })
+      .then(res => {
+        console.log(res.data.data);
+      });
+  }
 
   return sdk.transactions
     .transition({ id, transition, params }, { expand: true, include, ...IMAGE_VARIANTS })
@@ -549,8 +612,8 @@ export const sendReview = (role, tx, reviewRating, reviewContent) => (dispatch, 
   dispatch(sendReviewRequest());
 
   return txStateOtherPartyFirst
-    ? sendReviewAsSecond(tx.id, params, role, dispatch, sdk)
-    : sendReviewAsFirst(tx.id, params, role, dispatch, sdk);
+    ? sendReviewAsSecond(tx, params, role, dispatch, sdk)
+    : sendReviewAsFirst(tx, params, role, dispatch, sdk);
 };
 
 const isNonEmpty = value => {

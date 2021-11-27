@@ -74,6 +74,16 @@ export const filters = [
     config: {},
   },
   {
+    id: 'rating',
+    label: 'Rating',
+    // type: 'PriceFilter',
+    group: 'primary',
+    // Note: BookingDateRangeFilter is fixed filter,
+    // you can't change "queryParamNames: ['dates'],"
+    queryParamNames: ['meta_Rating'],
+    config: {},
+  },
+  {
     id: 'category',
     label: 'Category',
     type: 'SelectSingleFilter',
@@ -182,6 +192,8 @@ export const sortConfig = {
     { key: '-createdAt', label: 'Oldest' },
     { key: '-price', label: 'Lowest price' },
     { key: 'price', label: 'Highest price' },
+    { key: 'rating', label: 'High rating' },
+    { key: '-rating', label: 'Low rating' },
 
     // The relevance is only used for keyword search, but the
     // parameter isn't sent to the Marketplace API. The key is purely

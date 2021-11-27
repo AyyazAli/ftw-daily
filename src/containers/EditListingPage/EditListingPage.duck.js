@@ -495,6 +495,7 @@ export function requestShowListing(actionPayload) {
 export function requestCreateListingDraft(data) {
   return (dispatch, getState, sdk) => {
     dispatch(createListingDraft(data));
+    console.log('Listing draft: ' + data);
 
     const queryParams = {
       expand: true,

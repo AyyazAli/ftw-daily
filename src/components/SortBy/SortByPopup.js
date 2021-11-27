@@ -57,6 +57,8 @@ class SortByPopup extends Component {
       contentPlacementOffset,
     } = this.props;
 
+    console.log('Options: ' + options);
+
     // resolve menu label text and class
     const menuLabel = initialValue ? optionLabel(options, initialValue) : label;
 

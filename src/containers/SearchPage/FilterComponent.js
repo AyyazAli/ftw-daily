@@ -95,6 +95,19 @@ const FilterComponent = props => {
           {...rest}
         />
       );
+    // case 'RatingFilter': {
+    //   return (
+    //     <RatingFilter
+    //       id={componentId}
+    //       label={label}
+    //       queryParamNames={queryParamNames}
+    //       initialValues={initialValues(queryParamNames)}
+    //       onSubmit={getHandleChangedValueFn(useHistoryPush)}
+    //       {...config}
+    //       {...rest}
+    //     />
+    //   );
+    // }
     default:
       return null;
   }
