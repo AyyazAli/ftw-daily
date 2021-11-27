@@ -510,7 +510,7 @@ const sendReviewAsSecond = (tx, params, role, dispatch, sdk) => {
   const { id, listing, reviews } = tx;
   const { reviewRating } = params;
 
-  const averageRating = listing.attributes.metadata.averageRating;
+  const averageRating = listing.attributes.metadata.averageRating || 0;
   let updatedAverageRating = 0;
   const numberOfReviews = reviews.length;
 
