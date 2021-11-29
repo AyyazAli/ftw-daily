@@ -117,6 +117,8 @@ export class SearchPageComponent extends Component {
       activeListingId,
       onActivateListing,
     } = this.props;
+
+    // console.log('Sort config', sortConfig);
     // eslint-disable-next-line no-unused-vars
     const { mapSearch, page, ...searchInURL } = parse(location.search, {
       latlng: ['origin'],

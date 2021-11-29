@@ -43,6 +43,7 @@ class SortByPopup extends Component {
   selectOption(urlParam, option) {
     this.setState({ isOpen: false });
     this.props.onSelect(urlParam, option);
+    console.log(urlParam, option);
   }
 
   render() {
@@ -56,8 +57,6 @@ class SortByPopup extends Component {
       initialValue,
       contentPlacementOffset,
     } = this.props;
-
-    console.log('Options: ' + options);
 
     // resolve menu label text and class
     const menuLabel = initialValue ? optionLabel(options, initialValue) : label;

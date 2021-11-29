@@ -510,15 +510,15 @@ const sendReviewAsSecond = (tx, params, role, dispatch, sdk) => {
   const { id, listing, reviews } = tx;
   const { reviewRating } = params;
 
-  const averageRating = listing.attributes.metadata.averageRating || 0;
+  const rating = listing.attributes.metadata.rating || 0;
   let updatedAverageRating = 0;
   const numberOfReviews = reviews.length;
 
-  updatedAverageRating = (averageRating + reviewRating) / (numberOfReviews + 1);
+  updatedAverageRating = (rating + reviewRating) / (numberOfReviews + 1);
 
   if (role === CUSTOMER) {
     console.log(
-      'average rating: ' + averageRating,
+      'average rating: ' + rating,
       ' Number of reviews: ' + numberOfReviews,
       ' updated average rating: ' + updatedAverageRating
     );
@@ -526,7 +526,7 @@ const sendReviewAsSecond = (tx, params, role, dispatch, sdk) => {
     integrationSdk.listings
       .update({
         id: listing.id.uuid,
-        metadata: { averageRating: updatedAverageRating },
+        metadata: { rating: updatedAverageRating },
       })
       .then(res => {
         console.log(res.data.data);
@@ -560,15 +560,15 @@ const sendReviewAsFirst = (tx, params, role, dispatch, sdk) => {
   const { id, listing, reviews } = tx;
   const { reviewRating } = params;
 
-  const averageRating = listing.attributes.metadata.averageRating || 0;
+  const rating = listing.attributes.metadata.rating || 0;
   let updatedAverageRating = 0;
   const numberOfReviews = reviews.length;
 
-  updatedAverageRating = (averageRating + reviewRating) / (numberOfReviews + 1);
+  updatedAverageRating = (rating + reviewRating) / (numberOfReviews + 1);
 
   if (role === CUSTOMER) {
     console.log(
-      'average rating: ' + averageRating,
+      'average rating: ' + rating,
       ' Number of reviews: ' + numberOfReviews,
       ' updated average rating: ' + updatedAverageRating
     );
@@ -576,7 +576,7 @@ const sendReviewAsFirst = (tx, params, role, dispatch, sdk) => {
     integrationSdk.listings
       .update({
         id: listing.id.uuid,
-        metadata: { averageRating: updatedAverageRating },
+        metadata: { rating: updatedAverageRating },
       })
       .then(res => {
         console.log(res.data.data);
