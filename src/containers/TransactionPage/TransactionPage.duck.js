@@ -507,31 +507,7 @@ const sendReviewAsSecond = (tx, params, role, dispatch, sdk) => {
 
   const include = REVIEW_TX_INCLUDES;
 
-  const { id, listing, reviews } = tx;
-  const { reviewRating } = params;
-
-  const rating = listing.attributes.metadata.rating || 0;
-  let updatedAverageRating = 0;
-  const numberOfReviews = reviews.length;
-
-  updatedAverageRating = (rating + reviewRating) / (numberOfReviews + 1);
-
-  if (role === CUSTOMER) {
-    console.log(
-      'average rating: ' + rating,
-      ' Number of reviews: ' + numberOfReviews,
-      ' updated average rating: ' + updatedAverageRating
-    );
-
-    integrationSdk.listings
-      .update({
-        id: listing.id.uuid,
-        metadata: { rating: updatedAverageRating },
-      })
-      .then(res => {
-        console.log(res.data.data);
-      });
-  }
+  const { id } = tx;
 
   return sdk.transactions
     .transition({ id, transition, params }, { expand: true, include, ...IMAGE_VARIANTS })
@@ -557,31 +533,7 @@ const sendReviewAsSecond = (tx, params, role, dispatch, sdk) => {
 const sendReviewAsFirst = (tx, params, role, dispatch, sdk) => {
   const transition = getReview1Transition(role === CUSTOMER);
   const include = REVIEW_TX_INCLUDES;
-  const { id, listing, reviews } = tx;
-  const { reviewRating } = params;
-
-  const rating = listing.attributes.metadata.rating || 0;
-  let updatedAverageRating = 0;
-  const numberOfReviews = reviews.length;
-
-  updatedAverageRating = (rating + reviewRating) / (numberOfReviews + 1);
-
-  if (role === CUSTOMER) {
-    console.log(
-      'average rating: ' + rating,
-      ' Number of reviews: ' + numberOfReviews,
-      ' updated average rating: ' + updatedAverageRating
-    );
-
-    integrationSdk.listings
-      .update({
-        id: listing.id.uuid,
-        metadata: { rating: updatedAverageRating },
-      })
-      .then(res => {
-        console.log(res.data.data);
-      });
-  }
+  const { id } = tx;
 
   return sdk.transactions
     .transition({ id, transition, params }, { expand: true, include, ...IMAGE_VARIANTS })
@@ -606,6 +558,34 @@ const sendReviewAsFirst = (tx, params, role, dispatch, sdk) => {
 
 export const sendReview = (role, tx, reviewRating, reviewContent) => (dispatch, getState, sdk) => {
   const params = { reviewRating, reviewContent };
+
+  const { listing } = tx;
+
+  const review = reviewRating * 100;
+
+  const rating = listing.attributes.metadata.rating || 0;
+  let updatedAverageRating = 0;
+
+  let numberOfReviews = listing.attributes.metadata.numberOfReviews || 0;
+
+  updatedAverageRating = (rating + review) / (numberOfReviews + 1);
+
+  if (role === CUSTOMER) {
+    console.log(
+      'average rating: ' + rating,
+      ' Number of reviews: ' + numberOfReviews,
+      ' updated average rating: ' + updatedAverageRating
+    );
+
+    integrationSdk.listings
+      .update({
+        id: listing.id.uuid,
+        metadata: { rating: updatedAverageRating, numberOfReviews: numberOfReviews + 1 },
+      })
+      .then(res => {
+        console.log(res.data.data);
+      });
+  }
 
   const txStateOtherPartyFirst = txIsInFirstReviewBy(tx, role !== CUSTOMER);
 
