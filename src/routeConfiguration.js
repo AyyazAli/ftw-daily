@@ -249,7 +249,7 @@ const routeConfiguration = () => {
       auth: true,
       authPage: 'LoginPage',
       component: ManageWishlistsPage,
-      loadData: pageDataLoadingAPI.ManageWishlistsPage.loadData,
+      // loadData: pageDataLoadingAPI.ManageWishlistsPage.loadData,
     },
     {
       path: '/account',

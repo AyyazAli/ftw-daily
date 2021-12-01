@@ -5,6 +5,9 @@ import { connect } from 'react-redux';
 import { FormattedMessage, injectIntl, intlShape } from '../../util/reactIntl';
 import { propTypes } from '../../util/types';
 import { isScrollingDisabled } from '../../ducks/UI.duck';
+import { createInstance, types as sdkTypes } from '../../util/sdkLoader';
+import config from '../../config';
+import * as apiUtils from '../../util/api';
 import {
   Page,
   UserNav,
@@ -20,28 +23,42 @@ import {
   fetchCurrentUserWishlist,
   fetchCurrentUserWishlistListings,
 } from './ManageWishlistsPage.duck';
-import css from './ManageWishlistsPage.module.css';
-import { useSelector } from 'react-redux';
+
+const baseUrl = config.sdk.baseUrl ? { baseUrl: config.sdk.baseUrl } : {};
+
+const sdk = createInstance({
+  transitVerbose: config.sdk.transitVerbose,
+  clientId: config.sdk.clientId,
+  secure: config.usingSSL,
+  typeHandlers: apiUtils.typeHandlers,
+  ...baseUrl,
+});
 
 const ManageWishlistsPageComponent = props => {
-  const {
-    queryInProgress,
-    queryListingsError,
-    queryParams,
-    scrollingDisabled,
-    currentUser,
-    intl,
-    fetchCurrentUserWishlist,
-    fetchCurrentUserWishlistListings,
-  } = props;
+  const { scrollingDisabled, intl } = props;
 
-  const listings = useSelector(state => state.ManageWishlistPage.listings);
+  // const listings = useSelector(state => state.ManageWishlistPage.listings);
+  const [wishlistListings, setWishlistListings] = useState([]);
 
-  const loadingResults = (
-    <h2>
-      <FormattedMessage id="ManageListingsPage.loadingOwnListings" />
-    </h2>
-  );
+  useEffect(() => {
+    sdk.currentUser.show().then(response => {
+      const wishlist = response.data.data.attributes.profile.privateData.wishlist;
+
+      const listing = fetchWishlistListings(wishlist);
+      setWishlistListings(listing);
+    });
+  }, []);
+
+  const fetchWishlistListings = wishlist => {
+    const listings = [];
+    wishlist.map(listing => {
+      sdk.listings.show({ id: listing }).then(response => {
+        const res = response.data.data.attributes;
+        listings.push(res);
+      });
+    });
+    return listings;
+  };
 
   const title = intl.formatMessage({ id: 'ManageWishlistsPage.title' });
 
@@ -55,30 +72,32 @@ const ManageWishlistsPageComponent = props => {
         <LayoutWrapperMain>
           <h1>Your Wishlists</h1>
 
-          {!listings ? (
-            loadingResults
+          {wishlistListings.length < 0 ? (
+            <h1>No wishlists</h1>
           ) : (
             <table>
-              <tr>
-                <th>Title</th>
-                <th>Price</th>
-                <th>Amenities</th>
-              </tr>
-              {listings.map((wishlist, index) => {
-                return (
-                  <tr key={index}>
-                    <td>{wishlist.title}</td>
-                    <td>
-                      {wishlist.price.amount} {wishlist.price.currency}
-                    </td>
-                    <td>
-                      {wishlist.publicData.amenities.map((amenity, i) => {
-                        return <li key={i}> {amenity} </li>;
-                      })}
-                    </td>
-                  </tr>
-                );
-              })}
+              <tbody>
+                <tr>
+                  <th>Title</th>
+                  <th>Price</th>
+                  <th>Amenities</th>
+                </tr>
+                {wishlistListings.map((wishlist, index) => {
+                  return (
+                    <tr key={index}>
+                      <td>{wishlist.title}</td>
+                      <td>
+                        {wishlist.price.amount} {wishlist.price.currency}
+                      </td>
+                      <td>
+                        {wishlist.publicData.amenities.map((amenity, i) => {
+                          return <li key={i}> {amenity} </li>;
+                        })}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
             </table>
           )}
         </LayoutWrapperMain>

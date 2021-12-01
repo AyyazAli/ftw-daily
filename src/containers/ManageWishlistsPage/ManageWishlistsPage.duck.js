@@ -121,6 +121,6 @@ export const fetchCurrentUserWishlistListings = params => (dispatch, getState, s
   });
 };
 
-export const loadData = (params, search) => dispatch => {
-  return Promise.all([dispatch(fetchCurrentUserWishlist(params))]);
-};
+// export const loadData = (params, search) => dispatch => {
+//   return Promise.all([dispatch(fetchCurrentUserWishlist(params))]);
+// };

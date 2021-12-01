@@ -384,25 +384,6 @@ export const fetchTransactionLineItems = ({ bookingData, listingId, isOwnListing
     });
 };
 
-export const loadData = (params, search) => dispatch => {
-  const listingId = new UUID(params.id);
-
-  const ownListingVariants = [LISTING_PAGE_DRAFT_VARIANT, LISTING_PAGE_PENDING_APPROVAL_VARIANT];
-  if (ownListingVariants.includes(params.variant)) {
-    return dispatch(showListing(listingId, true));
-  }
-
-  if (config.enableAvailability) {
-    return Promise.all([
-      dispatch(showListing(listingId)),
-      dispatch(fetchTimeSlots(listingId)),
-      dispatch(fetchReviews(listingId)),
-    ]);
-  } else {
-    return Promise.all([dispatch(showListing(listingId)), dispatch(fetchReviews(listingId))]);
-  }
-};
-
 export const fetchCurrentUserWishlist = params => (dispatch, getState, sdk) => {
   return sdk.currentUser
     .show()
@@ -438,4 +419,23 @@ export const addCurrentUserWishlist = params => (dispatch, getState, sdk) => {
       console.log(response);
     })
     .catch(e => dispatch(fetchCurrentUserWishlistError(storableError(e))));
+};
+
+export const loadData = (params, search) => dispatch => {
+  const listingId = new UUID(params.id);
+
+  const ownListingVariants = [LISTING_PAGE_DRAFT_VARIANT, LISTING_PAGE_PENDING_APPROVAL_VARIANT];
+  if (ownListingVariants.includes(params.variant)) {
+    return dispatch(showListing(listingId, true));
+  }
+
+  if (config.enableAvailability) {
+    return Promise.all([
+      dispatch(showListing(listingId)),
+      dispatch(fetchTimeSlots(listingId)),
+      dispatch(fetchReviews(listingId)),
+    ]);
+  } else {
+    return Promise.all([dispatch(showListing(listingId)), dispatch(fetchReviews(listingId))]);
+  }
 };
