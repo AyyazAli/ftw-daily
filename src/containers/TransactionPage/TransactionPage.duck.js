@@ -568,7 +568,7 @@ export const sendReview = (role, tx, reviewRating, reviewContent) => (dispatch, 
 
   let numberOfReviews = listing.attributes.metadata.numberOfReviews || 0;
 
-  updatedAverageRating = (rating + review) / (numberOfReviews + 1);
+  updatedAverageRating = Math.trunc((rating * numberOfReviews + review) / (numberOfReviews + 1));
 
   if (role === CUSTOMER) {
     console.log(
