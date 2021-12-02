@@ -384,15 +384,16 @@ export const fetchTransactionLineItems = ({ bookingData, listingId, isOwnListing
     });
 };
 
-export const fetchCurrentUserWishlist = params => (dispatch, getState, sdk) => {
-  return sdk.currentUser
-    .show()
-    .then(response => {
-      const wishlist = response.data.data.attributes.profile.privateData.wishlist;
-      dispatch(fetchCurrentUserWishlistSuccess(wishlist));
-    })
-    .catch(e => dispatch(fetchCurrentUserWishlistError(storableError(e))));
-};
+// export const fetchCurrentUserWishlist = params => (dispatch, getState, sdk) => {
+//   // dispatch(fetchCurrentUserWishlistRequest());
+//   return sdk.currentUser
+//     .show()
+//     .then(response => {
+//       const wishlist = response.data.data.attributes.profile.privateData.wishlist;
+//       dispatch(fetchCurrentUserWishlistSuccess(wishlist));
+//     })
+//     .catch(e => dispatch(fetchCurrentUserWishlistError(storableError(e))));
+// };
 
 export const addWishlistToArray = params => (dispatch, getState, sdk) => {
   const { listing } = params;
@@ -402,8 +403,7 @@ export const addWishlistToArray = params => (dispatch, getState, sdk) => {
 };
 
 export const addCurrentUserWishlist = params => (dispatch, getState, sdk) => {
-  const { listing, privateData, wishlists } = params;
-  dispatch(addWishlistToArray(params));
+  const { listing, wishlists } = params;
 
   console.log('Before pushing', wishlists);
   wishlists.push(listing);
@@ -413,6 +413,9 @@ export const addCurrentUserWishlist = params => (dispatch, getState, sdk) => {
     console.log('After pushing and removing undefined', wishlists);
   }
 
+  dispatch(addWishlistToArray(params));
+
+  console.log('After pushing: ', wishlists);
   return sdk.currentUser
     .updateProfile({ privateData: { wishlist: wishlists } })
     .then(response => {
@@ -434,6 +437,7 @@ export const loadData = (params, search) => dispatch => {
       dispatch(showListing(listingId)),
       dispatch(fetchTimeSlots(listingId)),
       dispatch(fetchReviews(listingId)),
+      // dispatch(fetchCurrentUserWishlist()),
     ]);
   } else {
     return Promise.all([dispatch(showListing(listingId)), dispatch(fetchReviews(listingId))]);

@@ -19,11 +19,6 @@ import {
 } from '../../components';
 import { TopbarContainer } from '../../containers';
 
-import {
-  fetchCurrentUserWishlist,
-  fetchCurrentUserWishlistListings,
-} from './ManageWishlistsPage.duck';
-
 const baseUrl = config.sdk.baseUrl ? { baseUrl: config.sdk.baseUrl } : {};
 
 const sdk = createInstance({
@@ -37,28 +32,20 @@ const sdk = createInstance({
 const ManageWishlistsPageComponent = props => {
   const { scrollingDisabled, intl } = props;
 
-  // const listings = useSelector(state => state.ManageWishlistPage.listings);
   const [wishlistListings, setWishlistListings] = useState([]);
 
   useEffect(() => {
     sdk.currentUser.show().then(response => {
       const wishlist = response.data.data.attributes.profile.privateData.wishlist;
 
-      const listing = fetchWishlistListings(wishlist);
-      setWishlistListings(listing);
-    });
-  }, []);
-
-  const fetchWishlistListings = wishlist => {
-    const listings = [];
-    wishlist.map(listing => {
-      sdk.listings.show({ id: listing }).then(response => {
-        const res = response.data.data.attributes;
-        listings.push(res);
+      wishlist.forEach(listing => {
+        sdk.listings.show({ id: listing }).then(response => {
+          const res = response.data.data.attributes;
+          setWishlistListings(prevState => [...prevState, res]);
+        });
       });
     });
-    return listings;
-  };
+  }, []);
 
   const title = intl.formatMessage({ id: 'ManageWishlistsPage.title' });
 
@@ -87,7 +74,7 @@ const ManageWishlistsPageComponent = props => {
                     <tr key={index}>
                       <td>{wishlist.title}</td>
                       <td>
-                        {wishlist.price.amount} {wishlist.price.currency}
+                        {wishlist.price.amount.toString().slice(0, -2)} {wishlist.price.currency}
                       </td>
                       <td>
                         {wishlist.publicData.amenities.map((amenity, i) => {
@@ -109,17 +96,6 @@ const ManageWishlistsPageComponent = props => {
   );
 };
 
-ManageWishlistsPageComponent.defaultProps = {
-  listings: [],
-  pagination: null,
-  queryListingsError: null,
-  queryParams: null,
-  closingListing: null,
-  closingListingError: null,
-  openingListing: null,
-  openingListingError: null,
-};
-
 const { arrayOf, bool, func, object, shape, string } = PropTypes;
 
 ManageWishlistsPageComponent.propTypes = {
@@ -129,41 +105,14 @@ ManageWishlistsPageComponent.propTypes = {
 };
 
 const mapStateToProps = state => {
-  const {
-    currentPageResultIds,
-    pagination,
-    queryInProgress,
-    queryListingsError,
-    queryParams,
-    openingListing,
-    openingListingError,
-    closingListing,
-    closingListingError,
-  } = state.ManageListingsPage;
+  const { currentUser } = state.user;
   return {
-    currentPageResultIds,
-    pagination,
-    queryInProgress,
-    queryListingsError,
-    queryParams,
-    scrollingDisabled: isScrollingDisabled(state),
-    openingListing,
-    openingListingError,
-    closingListing,
-    closingListingError,
+    currentUser,
   };
 };
 
-const mapDispatchToProps = dispatch => ({
-  fetchCurrentUserWishlist: params => dispatch(fetchCurrentUserWishlist(params)),
-  fetchCurrentUserWishlistListings: params => dispatch(fetchCurrentUserWishlistListings(params)),
-});
-
 const ManageWishlistsPage = compose(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  ),
+  connect(mapStateToProps),
   injectIntl
 )(ManageWishlistsPageComponent);
 

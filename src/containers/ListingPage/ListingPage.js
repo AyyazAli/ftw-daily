@@ -41,12 +41,7 @@ import {
 } from '../../components';
 import { TopbarContainer, NotFoundPage } from '../../containers';
 
-import {
-  sendEnquiry,
-  fetchTransactionLineItems,
-  setInitialValues,
-  fetchCurrentUserWishlist,
-} from './ListingPage.duck';
+import { sendEnquiry, fetchTransactionLineItems, setInitialValues } from './ListingPage.duck';
 import SectionImages from './SectionImages';
 import SectionAvatar from './SectionAvatar';
 import SectionHeading from './SectionHeading';
@@ -203,6 +198,7 @@ export class ListingPageComponent extends Component {
       fetchLineItemsInProgress,
       fetchLineItemsError,
       history,
+      wishlistArray,
     } = this.props;
 
     const listingId = new UUID(rawParams.id);
@@ -446,6 +442,7 @@ export class ListingPageComponent extends Component {
                     listingId={listingId}
                     currentUser={currentUser}
                     history={history}
+                    // wishlistArray={wishlistArray}
                   />
                   <SectionDescriptionMaybe description={description} />
                   <SectionFeaturesMaybe options={amenityOptions} publicData={publicData} />
@@ -618,7 +615,6 @@ const mapDispatchToProps = dispatch => ({
     dispatch(fetchTransactionLineItems(bookingData, listingId, isOwnListing)),
   onSendEnquiry: (listingId, message) => dispatch(sendEnquiry(listingId, message)),
   onInitializeCardPaymentData: () => dispatch(initializeCardPaymentData()),
-  fetchCurrentUserWishlist: params => dispatch(fetchCurrentUserWishlist(params)),
 });
 
 // Note: it is important that the withRouter HOC is **outside** the
