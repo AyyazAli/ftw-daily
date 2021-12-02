@@ -384,38 +384,23 @@ export const fetchTransactionLineItems = ({ bookingData, listingId, isOwnListing
     });
 };
 
-// export const fetchCurrentUserWishlist = params => (dispatch, getState, sdk) => {
-//   // dispatch(fetchCurrentUserWishlistRequest());
-//   return sdk.currentUser
-//     .show()
-//     .then(response => {
-//       const wishlist = response.data.data.attributes.profile.privateData.wishlist;
-//       dispatch(fetchCurrentUserWishlistSuccess(wishlist));
-//     })
-//     .catch(e => dispatch(fetchCurrentUserWishlistError(storableError(e))));
-// };
-
 export const addWishlistToArray = params => (dispatch, getState, sdk) => {
   const { listing } = params;
 
-  console.log('Passing wishlist to be added to array...: ', listing);
   return dispatch(addWishlistToWishlistArray(listing));
 };
 
 export const addCurrentUserWishlist = params => (dispatch, getState, sdk) => {
   const { listing, wishlists } = params;
 
-  console.log('Before pushing', wishlists);
   wishlists.push(listing);
 
   if (wishlists[0] == undefined) {
     wishlists.shift();
-    console.log('After pushing and removing undefined', wishlists);
   }
 
   dispatch(addWishlistToArray(params));
 
-  console.log('After pushing: ', wishlists);
   return sdk.currentUser
     .updateProfile({ privateData: { wishlist: wishlists } })
     .then(response => {

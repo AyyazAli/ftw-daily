@@ -571,12 +571,6 @@ export const sendReview = (role, tx, reviewRating, reviewContent) => (dispatch, 
   updatedAverageRating = Math.trunc((rating * numberOfReviews + review) / (numberOfReviews + 1));
 
   if (role === CUSTOMER) {
-    console.log(
-      'average rating: ' + rating,
-      ' Number of reviews: ' + numberOfReviews,
-      ' updated average rating: ' + updatedAverageRating
-    );
-
     integrationSdk.listings
       .update({
         id: listing.id.uuid,
