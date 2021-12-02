@@ -27,7 +27,11 @@ const SectionHeadingComponent = props => {
     history,
   } = props;
 
-  const wishlists = currentUser ? currentUser.attributes.profile.privateData.wishlist : [];
+  const wishlists = currentUser
+    ? currentUser.attributes.profile.privateData.wishlist
+      ? currentUser.attributes.profile.privateData.wishlist
+      : []
+    : [];
 
   const unitType = config.bookingUnitType;
   const isNightly = unitType === LINE_ITEM_NIGHT;
@@ -45,6 +49,7 @@ const SectionHeadingComponent = props => {
   const privateData = profile.privateData || {};
 
   const handleWishlist = () => {
+    console.log(wishlists);
     if (!user.id) {
       const path = pathByRouteName('LoginPage', routeConfiguration());
       history.push(path);
