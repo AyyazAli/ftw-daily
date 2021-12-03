@@ -198,7 +198,6 @@ export class ListingPageComponent extends Component {
       fetchLineItemsInProgress,
       fetchLineItemsError,
       history,
-      wishlistArray,
     } = this.props;
 
     const listingId = new UUID(rawParams.id);
@@ -442,7 +441,6 @@ export class ListingPageComponent extends Component {
                     listingId={listingId}
                     currentUser={currentUser}
                     history={history}
-                    // wishlistArray={wishlistArray}
                   />
                   <SectionDescriptionMaybe description={description} />
                   <SectionFeaturesMaybe options={amenityOptions} publicData={publicData} />
@@ -569,7 +567,6 @@ const mapStateToProps = state => {
     fetchLineItemsInProgress,
     fetchLineItemsError,
     enquiryModalOpenForListingId,
-    wishlistArray,
   } = state.ListingPage;
   const { currentUser } = state.user;
 
@@ -602,7 +599,6 @@ const mapStateToProps = state => {
     fetchLineItemsError,
     sendEnquiryInProgress,
     sendEnquiryError,
-    wishlistArray,
   };
 };
 
