@@ -146,7 +146,6 @@ class MainPanel extends Component {
       ? { ...urlQueryParams, [urlParam]: values }
       : omit(urlQueryParams, urlParam);
 
-    console.log(queryParams, urlParam, values);
     history.push(createResourceLocatorString('SearchPage', routeConfiguration(), {}, queryParams));
   }
 

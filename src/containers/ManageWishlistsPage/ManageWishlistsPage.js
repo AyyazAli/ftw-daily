@@ -33,7 +33,7 @@ const sdk = createInstance({
 const ManageWishlistsPageComponent = props => {
   const { scrollingDisabled, intl } = props;
 
-  const [wishlistListings, setWishlistListings] = useState([]);
+  const [listings, setListings] = useState([]);
 
   useEffect(() => {
     sdk.currentUser.show().then(response => {
@@ -42,7 +42,7 @@ const ManageWishlistsPageComponent = props => {
       wishlist.forEach(listing => {
         sdk.listings.show({ id: listing }).then(response => {
           const res = response.data.data.attributes;
-          setWishlistListings(prevState => [...prevState, res]);
+          setListings(prevState => [...prevState, res]);
         });
       });
     });
@@ -78,7 +78,7 @@ const ManageWishlistsPageComponent = props => {
         </LayoutWrapperTopbar>
         <LayoutWrapperMain>
           <div className={css.wishlistPanel}>
-            {wishlistListings.length == 0 ? (
+            {listings.length == 0 ? (
               <NoResults />
             ) : (
               <table className={css.table}>
@@ -90,7 +90,7 @@ const ManageWishlistsPageComponent = props => {
                   </tr>
                 </thead>
                 <tbody>
-                  {wishlistListings.map((wishlist, index) => {
+                  {listings.map((wishlist, index) => {
                     return (
                       <tr key={index}>
                         <td>{wishlist.title}</td>

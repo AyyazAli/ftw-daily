@@ -43,7 +43,6 @@ class SortByPopup extends Component {
   selectOption(urlParam, option) {
     this.setState({ isOpen: false });
     this.props.onSelect(urlParam, option);
-    console.log(urlParam, option);
   }
 
   render() {
