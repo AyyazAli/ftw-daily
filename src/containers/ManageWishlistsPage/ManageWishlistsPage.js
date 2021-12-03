@@ -16,8 +16,10 @@ import {
   LayoutWrapperMain,
   LayoutWrapperFooter,
   Footer,
+  Table,
 } from '../../components';
 import { TopbarContainer } from '../../containers';
+import css from './ManageWishlistsPage.module.css';
 
 const baseUrl = config.sdk.baseUrl ? { baseUrl: config.sdk.baseUrl } : {};
 
@@ -36,7 +38,7 @@ const ManageWishlistsPageComponent = props => {
 
   useEffect(() => {
     sdk.currentUser.show().then(response => {
-      const wishlist = response.data.data.attributes.profile.privateData.wishlist;
+      const wishlist = response.data.data.attributes.profile.privateData.wishlist || [];
 
       wishlist.forEach(listing => {
         sdk.listings.show({ id: listing }).then(response => {
@@ -49,44 +51,63 @@ const ManageWishlistsPageComponent = props => {
 
   const title = intl.formatMessage({ id: 'ManageWishlistsPage.title' });
 
+  const NoResults = () => {
+    return (
+      <h1 className={css.noResults}>
+        <FormattedMessage id="ManageWishlistsPage.noResults" />
+      </h1>
+    );
+  };
+
+  const formatLabel = amenity => {
+    const label = amenity.charAt(0).toUpperCase() + amenity.slice(1);
+    return label.replace(/_/g, ' ');
+  };
+
+  const formatPrice = price => {
+    const { amount, currency } = price;
+
+    return amount.toString().slice(0, -2) + ' ' + currency;
+  };
+
   return (
     <Page title={title} scrollingDisabled={scrollingDisabled}>
       <LayoutSingleColumn>
         <LayoutWrapperTopbar>
-          <TopbarContainer currentPage="ManageListingsPage" />
-          <UserNav selectedPageName="ManageListingsPage" />
+          <TopbarContainer currentPage="ManageWishlistsPage" />
+          <UserNav selectedPageName="ManageWishlistsPage" />
         </LayoutWrapperTopbar>
         <LayoutWrapperMain>
-          <h1>Your Wishlists</h1>
-
-          {wishlistListings.length < 0 ? (
-            <h1>No wishlists</h1>
-          ) : (
-            <table>
-              <tbody>
-                <tr>
-                  <th>Title</th>
-                  <th>Price</th>
-                  <th>Amenities</th>
-                </tr>
-                {wishlistListings.map((wishlist, index) => {
-                  return (
-                    <tr key={index}>
-                      <td>{wishlist.title}</td>
-                      <td>
-                        {wishlist.price.amount.toString().slice(0, -2)} {wishlist.price.currency}
-                      </td>
-                      <td>
-                        {wishlist.publicData.amenities.map((amenity, i) => {
-                          return <li key={i}> {amenity} </li>;
-                        })}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
+          <div className={css.wishlistPanel}>
+            {wishlistListings.length == 0 ? (
+              <NoResults />
+            ) : (
+              <table className={css.table}>
+                <thead>
+                  <tr>
+                    <th>Listing</th>
+                    <th>Price</th>
+                    <th>Amenities</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {wishlistListings.map((wishlist, index) => {
+                    return (
+                      <tr key={index}>
+                        <td>{wishlist.title}</td>
+                        <td>{formatPrice(wishlist.price)}</td>
+                        <td>
+                          {wishlist.publicData.amenities.map((amenity, i) => {
+                            return <li key={i}>{formatLabel(amenity)}</li>;
+                          })}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
+          </div>
         </LayoutWrapperMain>
         <LayoutWrapperFooter>
           <Footer />
@@ -96,7 +117,7 @@ const ManageWishlistsPageComponent = props => {
   );
 };
 
-const { arrayOf, bool, func, object, shape, string } = PropTypes;
+const { arrayOf } = PropTypes;
 
 ManageWishlistsPageComponent.propTypes = {
   listings: arrayOf(propTypes.ownListing),
@@ -108,6 +129,7 @@ const mapStateToProps = state => {
   const { currentUser } = state.user;
   return {
     currentUser,
+    scrollingDisabled: isScrollingDisabled(state),
   };
 };
 

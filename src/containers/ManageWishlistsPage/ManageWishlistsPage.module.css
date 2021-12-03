@@ -1,0 +1,53 @@
+@import '../../styles/customMediaQueries.css';
+
+.wishlistPanel {
+  width: 100%;
+  margin: 10px auto 0 auto;
+
+  @media (--viewportMedium) {
+    margin: 48px auto 0 auto;
+  }
+
+  @media (--viewportLarge) {
+    margin: 80px auto 0 auto;
+    max-width: 62.5vw;
+  }
+}
+
+.title {
+  margin: 0 24px 24px 24px;
+
+  @media (--viewportMedium) {
+    margin: 0 24px 48px 24px;
+  }
+
+  @media (--viewportLarge) {
+    margin: 0 36px 48px 36px;
+  }
+}
+
+.table {
+  width: 100%;
+  background-color: #ffffff;
+  border-collapse: collapse;
+  border-width: 2px;
+  border-color: #36990b;
+  border-style: solid;
+  color: #4a4a4a;
+}
+
+.table td,
+.table th {
+  border-width: 2px;
+  border-color: #36990b;
+  border-style: solid;
+  padding: 20px;
+}
+
+.table td li {
+  margin-left: 10px;
+}
+
+.table thead {
+  background-color: #ffffff;
+}
