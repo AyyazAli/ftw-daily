@@ -49,7 +49,6 @@ const SectionHeadingComponent = props => {
   const privateData = profile.privateData || {};
 
   const handleWishlist = () => {
-    console.log(wishlists);
     if (!user.id) {
       const path = pathByRouteName('LoginPage', routeConfiguration());
       history.push(path);
