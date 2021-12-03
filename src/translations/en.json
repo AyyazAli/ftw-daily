@@ -434,6 +434,8 @@
   "ManageListingsPage.yourListings": "Your listings",
   "ManageWishlistsPage.title": "Manage wishlists",
   "ManageListingsPage.yourWishlists": "Your wishlists",
+    "ManageWishlistsPage.noResults": "You don't have any wishlists.",
+
   "MapPriceMarker.unsupportedPrice": "({currency})",
   "Modal.close": "CLOSE",
   "Modal.closeModal": "Close modal",
