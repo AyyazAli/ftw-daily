@@ -16,7 +16,6 @@ import {
   LayoutWrapperMain,
   LayoutWrapperFooter,
   Footer,
-  Table,
 } from '../../components';
 import { TopbarContainer } from '../../containers';
 import css from './ManageWishlistsPage.module.css';
